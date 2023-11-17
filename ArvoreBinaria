@@ -1,0 +1,91 @@
+class ArvoreBinaria:
+    def __init__(self, valor):
+        self.chave = valor
+        self.esquerda = self.direita = None
+
+    def inserirNo(self, valor):
+        if valor < self.chave:
+            self.esquerda = self.esquerda or ArvoreBinaria(valor)
+        elif valor > self.chave:
+            self.direita = self.direita or ArvoreBinaria(valor)
+
+    def preOrdem(self):
+        print(self.chave, end=" ")
+        if self.esquerda: self.esquerda.preOrdem()
+        if self.direita: self.direita.preOrdem()
+
+    def emOrdem(self):
+        if self.esquerda: self.esquerda.emOrdem()
+        print(self.chave, end=" ")
+        if self.direita: self.direita.emOrdem()
+
+    def posOrdem(self):
+        if self.esquerda: self.esquerda.posOrdem()
+        if self.direita: self.direita.posOrdem()
+        print(self.chave, end=" ")
+
+    def buscarValor(self, valor):
+        if self.chave == valor:
+            print("Encontrado!")
+            return True
+        elif valor < self.chave and self.esquerda:
+            print(self.chave, end=" -> ")
+            return self.esquerda.buscarValor(valor)
+        elif valor > self.chave and self.direita:
+            print(self.chave, end=" -> ")
+            return self.direita.buscarValor(valor)
+        else:
+            print("Não encontrado!")
+            return False
+
+    def removerNo(self, valor, pai=None):
+        if valor < self.chave and self.esquerda:
+            self.esquerda, _ = self.esquerda.removerNo(valor, pai=self)
+        elif valor > self.chave and self.direita:
+            self.direita, _ = self.direita.removerNo(valor, pai=self)
+        else:
+            if self.esquerda and self.direita:
+                no_minimo = self.direita._obter_no_valor_minimo()
+                self.chave = no_minimo.chave
+                self.direita, _ = self.direita.removerNo(no_minimo.chave, pai=self)
+            elif self.esquerda:
+                return self.esquerda, pai
+            elif self.direita:
+                return self.direita, pai
+            else:
+                return None, pai
+
+        return self, pai
+
+    def _obter_no_valor_minimo(self):
+        atual = self
+        while atual.esquerda:
+            atual = atual.esquerda
+        return atual
+
+
+# Criando um nó raiz
+raiz = ArvoreBinaria(20)
+valores = [10, 8, 15, 40, 30, 50]
+
+# Inserindo valores
+for valor in valores:
+    raiz.inserirNo(valor)
+
+# Imprimindo o caminho até um valor
+valor_para_buscar = 30
+print("Caminho até {}: ".format(valor_para_buscar), end="")
+raiz.buscarValor(valor_para_buscar)
+print()
+
+# Removendo um nó
+valor_para_remover = 10
+raiz, _ = raiz.removerNo(valor_para_remover)
+
+# Imprimindo a árvore após a remoção
+print("\nPré-Ordem após a remoção:")
+raiz.preOrdem()
+print("\nEm Ordem após a remoção:")
+raiz.emOrdem()
+print("\nPós-Ordem após a remoção:")
+raiz.posOrdem()
